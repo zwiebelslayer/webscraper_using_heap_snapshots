@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+setup.py
+heap_snapshot_parser.egg-info/PKG-INFO
+heap_snapshot_parser.egg-info/SOURCES.txt
+heap_snapshot_parser.egg-info/dependency_links.txt
+heap_snapshot_parser.egg-info/not-zip-safe
+heap_snapshot_parser.egg-info/requires.txt
+heap_snapshot_parser.egg-info/top_level.txt

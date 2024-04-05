@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: heap_snapshot_parser
+Version: 0.0.2
+Summary: DRAIN GANG 
+Author: X X
+Author-email: X X
+Requires-Python: >=3.7
+Provides-Extra: test
+Requires-Dist: pytest>=6.0; extra == "test"
