@@ -1,2 +1,5 @@
 cmake-build-debug
 build
+heap_snapshot_parser.egg-info
+.idea
+.vscode
