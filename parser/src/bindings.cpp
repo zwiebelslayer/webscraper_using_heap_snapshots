@@ -1,4 +1,6 @@
 #include <pybind11/pybind11.h>
+#include "interface.h"
+#include <pybind11/stl.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -10,34 +12,8 @@ int add(int i, int j) {
 namespace py = pybind11;
 
 PYBIND11_MODULE(heap_snapshot_parser, m) {
-    m.doc() = R"pbdoc(
-        Pybind11 example plugin
-        -----------------------
-
-        .. currentmodule:: cmake_example
-
-        .. autosummary::
-           :toctree: _generate
-
-           add
-           subtract
-    )pbdoc";
-
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-#ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
+    py::class_<ParserInterface>(m, "ParserInterface")
+            .def(py::init<std::string &>()) // constructor
+            .def("create_graph", &ParserInterface::create_graph)
+            .def("query", &ParserInterface::query_for_properties);
 }
