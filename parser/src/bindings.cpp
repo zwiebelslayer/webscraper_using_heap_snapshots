@@ -13,7 +13,9 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(heap_snapshot_parser, m) {
     py::class_<ParserInterface>(m, "ParserInterface")
-            .def(py::init<std::string &>()) // constructor
+            .def(py::init<std::string>()) // constructor
             .def("create_graph", &ParserInterface::create_graph)
-            .def("query", &ParserInterface::query_for_properties);
+            .def("query", &ParserInterface::query_for_properties)
+            .def("shutdown", &ParserInterface::shutdown)
+            ;
 }

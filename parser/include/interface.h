@@ -7,14 +7,14 @@
 class ParserInterface{
 public:
     ParserInterface(std::string to_parse_str);
-    ~ParserInterface() = default;
+    ~ParserInterface();
 
     void create_graph();
     std::vector<std::unordered_map<std::string, std::string>> query_for_properties(std::vector<std::string>);
-
+    void shutdown();
 private:
     std::unique_ptr<Heap_Snapshot_Parser> p_parser;
-
+    bool is_valid;
 };
 
 
