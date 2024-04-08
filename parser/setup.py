@@ -130,7 +130,7 @@ setup(
     version="0.0.3",
     author="X X",
     author_email="X X",
-    description="DRAIN GANG ",
+    description="DRAIN GANG",
     long_description="",
     ext_modules=[CMakeExtension("heap_snapshot_parser")],
     cmdclass={"build_ext": CMakeBuild},

@@ -1,10 +1,14 @@
-from heap_snapshot_parser import ParserInterface
+from HPScraper import HPScraper
 
-with open("test.heapsnapshot", "r") as file:
-    str_with_contents = file.read()
+URL = 'https://www.amazon.de/dp/B06Y5VBFNB'
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
 
-print(str_with_contents)
-parser = ParserInterface(str_with_contents)
-parser.create_graph()
-res = parser.query(["asin", "price"])
-print(res)
+
+def main():
+    scraper = HPScraper(user_agent=USER_AGENT)
+    results = scraper.query_page_for_props(URL, ["asin", "ourPrice"])
+    print(results)
+
+
+if __name__ == '__main__':
+    main()
