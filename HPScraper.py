@@ -11,7 +11,7 @@ class HPScraper:
         :param user_agent: Optional: custom user agent if needed
         :param proxy: Optional: proxy if needed
         """
-        
+        self.use_proxy = use_proxy
         if use_proxy:
             self.proxy = kwargs.get('proxy')
         else:
@@ -25,11 +25,11 @@ class HPScraper:
         :return: nothing, will be used as a lambda
         """
         self.heap_snapshot += str(chunk["chunk"])
-        
-    def _sync_create_heap_snapshot(self, page_url: str):
+    
+    def _sync_create_heap_snapshot(self, page_url: str, callback_function=None):
         with sync_playwright() as p:
-            if len(self.proxy) > 0:
-                browser = p.chromium.launch()
+            if self.use_proxy:
+                browser = p.chromium.launch(proxy=self.proxy)
             else:
                 browser = p.chromium.launch()
             if len(self.user_agent) > 0:
@@ -39,38 +39,32 @@ class HPScraper:
             
             page = context.new_page()
             page.goto(page_url)
+            if callback_function is not None:
+                callback_function(page)
+            
             client = page.context.new_cdp_session(page)  # open a cdp session
-            """
-            scroll with the mouse a bit to ensure that every data is loaded
-            some pages only load the wanted information if you interact with it
-            all values in this loop are random feel free to change them or remove the loop
-            """
-            #TODO: add some kind of hook to let the user click buttons on the page!
-            for i in range(3):
-                page.mouse.wheel(0, 15000)
-            
+            # https://chromedevtools.github.io/devtools-protocol/v8/HeapProfiler/#method-takeHeapSnapshot
             client.on("HeapProfiler.addHeapSnapshotChunk", lambda event: self.handle_sync_heapsnapshot(event))
-            client.send('HeapProfiler.takeHeapSnapshot')
-            
-    
-    def query_page_for_props(self, page_url: str, query_strs: [str], **kwargs) -> dict:
+            create_snapshot = client.send(method='HeapProfiler.takeHeapSnapshot', params={"captureNumericValue": True})
+
+    def query_page_for_props(self, page_url: str, query_strs: [str], callback_function=None, **kwargs) -> dict:
         """
-        :param query_strs: For what properties will the page be queryied
-        :param kwargs: proxy
+        :param page_url: the url to scrape data from
+        :param query_strs: For what properties will the page be queried
+        :param callback_function: a function where the user can manipulate the page. the function receives the page from playwright
+        :param kwargs:
+        
         :return: the results
         
         This will create a heap snapshot and then query the page for properties
         """
         self.heap_snapshot = ""
-        self._sync_create_heap_snapshot(page_url)
+        self._sync_create_heap_snapshot(page_url, callback_function)
         if len(self.heap_snapshot) == 0:
             raise AssertionError("heap snapshot is empty")
         
         test_str = self.heap_snapshot
         
-        with open("tesfile.json", "w") as f:
-            f.write(test_str)
-            
         parser = ParserInterface(test_str)
         parser.create_graph()
         query_result = parser.query(query_strs)
