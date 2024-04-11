@@ -24,10 +24,12 @@ def my_callback_function(page: Page):
         
     print("my callback function called")
     
+def add_cookies(context):
+    context.add_cookie({"session-id": "1"}, {"session-token": "2"})
 
 def main():
     scraper = HPScraper(user_agent=USER_AGENT)
-    results = scraper.query_page_for_props(URL, ["offers"], callback_function=my_callback_function)
+    results = scraper.query_page_for_props(URL, ["offers"],coontext_callback_function=add_cookies, page_callback_function=my_callback_function)
     print(results)
     first_result = results[0]
     ean = first_result.get("ean")
