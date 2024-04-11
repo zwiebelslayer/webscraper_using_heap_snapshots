@@ -16,7 +16,7 @@ class HPScraper:
             self.proxy = kwargs.get('proxy')
         else:
             self.proxy = ""
-        self.user_agent = kwargs.get('proxy', '')
+        self.user_agent = kwargs.get('user_agent', '')
         self.heap_snapshot: str = ""
     
     def handle_sync_heapsnapshot(self, chunk: dict):
@@ -25,9 +25,8 @@ class HPScraper:
         :return: nothing, will be used as a lambda
         """
         self.heap_snapshot += str(chunk["chunk"])
-        
-        
-    def _sync_create_heap_snapshot(self, page_url: str, callback_function=None):
+    
+    def _sync_create_heap_snapshot(self, page_url: str, context_callback_function=None, page_callback_function=None):
         with sync_playwright() as p:
             if self.use_proxy:
                 browser = p.chromium.launch(proxy=self.proxy)
@@ -38,16 +37,20 @@ class HPScraper:
             else:
                 context = browser.new_context()
             
+            if context_callback_function is not None:
+                context_callback_function(context)
+            
             page = context.new_page()
             page.goto(page_url)
-            if callback_function is not None:
-                callback_function(page)
+            
+            if page_callback_function is not None:
+                page_callback_function(page)
             
             client = page.context.new_cdp_session(page)  # open a cdp session
             # https://chromedevtools.github.io/devtools-protocol/v8/HeapProfiler/#method-takeHeapSnapshot
             client.on("HeapProfiler.addHeapSnapshotChunk", lambda event: self.handle_sync_heapsnapshot(event))
             create_snapshot = client.send(method='HeapProfiler.takeHeapSnapshot', params={"captureNumericValue": True})
-
+    
     def query_page_for_props(self, page_url: str, query_strs: [str], callback_function=None, **kwargs) -> dict:
         """
         :param page_url: the url to scrape data from
@@ -71,7 +74,8 @@ class HPScraper:
         parser.shutdown()
         return query_result
     
-    async def async_query_page_for_props(self, page_urls: [str], query_strs: [str], callback_function=None, **kwargs) -> dict:
+    async def async_query_page_for_props(self, page_urls: [str], query_strs: [str], callback_function=None,
+                                         **kwargs) -> dict:
         """
         :param page_urls: list of urls to scrape data
         :param query_strs: For what properties will the page be queried

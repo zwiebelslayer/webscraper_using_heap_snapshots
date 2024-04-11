@@ -1,7 +1,7 @@
 # Purpose
 Scrape Website using a heap snapshot created by playwright, then parse the heap snapshot for the desired data 
 
-# How to install
+# How to install (currently there is c++ lib not included in this repo, so building will fail)
 Clone this repo, then cd to the lib dir here and pip install ./parser
 this will build the c libraray and install it into your local python env.
 Make sure to install playwright afterwards. 
