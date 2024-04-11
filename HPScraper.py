@@ -25,7 +25,8 @@ class HPScraper:
         :return: nothing, will be used as a lambda
         """
         self.heap_snapshot += str(chunk["chunk"])
-    
+        
+        
     def _sync_create_heap_snapshot(self, page_url: str, callback_function=None):
         with sync_playwright() as p:
             if self.use_proxy:
@@ -53,7 +54,6 @@ class HPScraper:
         :param query_strs: For what properties will the page be queried
         :param callback_function: a function where the user can manipulate the page. the function receives the page from playwright
         :param kwargs:
-        
         :return: the results
         
         This will create a heap snapshot and then query the page for properties
@@ -70,3 +70,13 @@ class HPScraper:
         query_result = parser.query(query_strs)
         parser.shutdown()
         return query_result
+    
+    async def async_query_page_for_props(self, page_urls: [str], query_strs: [str], callback_function=None, **kwargs) -> dict:
+        """
+        :param page_urls: list of urls to scrape data
+        :param query_strs: For what properties will the page be queried
+        :param callback_function: a function where the user can manipulate the page. the function receives the page from playwright
+        :param kwargs:
+        :return: the results
+        """
+        pass
