@@ -41,6 +41,15 @@ class HPScraper:
                 context_callback_function(context)
             
             page = context.new_page()
+            
+            def block_unnecessary_requests(route, request):
+                if request.resource_type in ["image", "stylesheet", "media", "font"]:
+                    route.abort()  # Block these requests
+                else:
+                    route.continue_()  # Allow other requests
+            
+            page.route("**/*", block_unnecessary_requests)
+            
             page.goto(page_url)
             
             if page_callback_function is not None:
